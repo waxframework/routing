@@ -113,7 +113,7 @@ class Route
             return RouteServiceProvider::$container->call( $callback );
         } elseif ( 2 === count( $callback ) ) {
             $controller = RouteServiceProvider::$container->get( $callback[0] );
-            return $controller->{$callback[1]}();
+            return RouteServiceProvider::$container->call( [$controller, $callback[1]] );
         }
 
         Response::set_headers( [], 404 );
