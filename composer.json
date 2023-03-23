@@ -1,0 +1,13 @@
+{
+    "name": "waxframework/routing",
+    "type": "library",
+    "license": "MIT",
+    "version": "1.0.0",
+    "autoload": {
+        "psr-4": {
+            "WaxFramework\\Routing\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}
