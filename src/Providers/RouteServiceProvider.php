@@ -7,7 +7,7 @@ use WaxFramework\Routing\DataBinder;
 use WaxFramework\Routing\Ajax;
 use WaxFramework\Routing\Middleware;
 
-class RouteServiceProvider
+abstract class RouteServiceProvider
 {
     public static $container;
 
