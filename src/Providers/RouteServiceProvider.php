@@ -15,6 +15,28 @@ abstract class RouteServiceProvider
 
     public function boot() {
         add_action( 'rest_api_init', [$this, 'action_rest_api_init'] );
+        /**
+         * Hook fire priority https://codex.wordpress.org/Plugin_API/Action_Reference
+         */
+        add_action( 'template_redirect', [$this, 'action_ajax_api_init'], 1 );
+    }
+
+    public function action_ajax_api_init() {
+        global $wp_query;
+        
+        if ( isset( $wp_query->query['pagename'] ) && 0 === strpos( $wp_query->query['pagename'], static::$properties['ajax']['namespace'] ) ) {
+            static::init_routes( 'ajax' );
+            if ( ! Ajax::$route_found ) {
+                Response::set_headers( [], 404 );
+                echo wp_json_encode(
+                    [
+                        'code'    => 'ajax_no_route', 
+                        'message' => 'No route was found matching the URL and request method.'
+                    ] 
+                );
+            }
+            exit;
+        }
     }
 
     /**
@@ -22,38 +44,6 @@ abstract class RouteServiceProvider
      */
     public function action_rest_api_init(): void {
         static::init_routes( 'rest' );
-    }
-
-    public function ajax_init() : void {
-        /** Allow for cross-domain requests (from the front end). */
-        send_origin_headers();
-        header( 'Content-Type: text/html; charset=' . get_option( 'blog_charset' ) );
-        header( 'X-Robots-Tag: noindex' );
-
-        // Require a valid action parameter.
-        if ( empty( $_REQUEST['action'] ) || ! is_scalar( $_REQUEST['action'] ) ) {
-            Response::set_headers( [], 404 );
-            echo wp_json_encode(
-                [
-                    'code'    => 'ajax_no_route',
-                    'message' => 'No route was found matching the URL and request method.'
-                ]
-            );
-            exit;
-        }
-
-        static::init_routes( 'ajax' );
-
-        if ( ! Ajax::$route_found ) {
-            Response::set_headers( [], 404 );
-            echo wp_json_encode(
-                [
-                    'code'    => 'ajax_no_route', 
-                    'message' => 'No route was found matching the URL and request method.'
-                ] 
-            );
-            exit;
-        }
     }
 
     protected static function init_routes( string $type ) {

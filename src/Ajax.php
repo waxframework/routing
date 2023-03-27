@@ -19,8 +19,10 @@ class Ajax extends Route
         $route      = static::get_final_route( $route );
         $middleware = array_merge( static::$group_middleware, $middleware );
        
-        $path  = '/' . trim( $_REQUEST['action'], '/' );
-        $match = preg_match( '@^' . $route . '$@i', $path , $matches );
+        global $wp_query;
+
+        $path  = '/' . $wp_query->query['pagename'] . '/' . $wp_query->query['page'];
+        $match = preg_match( '@^' . $route . '$@i', rtrim( $path, '/' ) , $matches );
 
         if ( ! $match ) {
             return;
@@ -28,6 +30,9 @@ class Ajax extends Route
 
         static::$route_found = true;
 
+        /**
+         * Fire admin init if the current API has admin middleware
+         */
         static::admin_init( $middleware );
 
         $is_allowed = Middleware::is_user_allowed( $middleware );
@@ -59,6 +64,9 @@ class Ajax extends Route
         exit;
     }
 
+    /**
+     * Fire admin init if the current API has admin middleware
+     */
     protected static function admin_init( array $middleware ) {
 
         if ( ! in_array( 'admin', $middleware ) ) {
@@ -72,16 +80,13 @@ class Ajax extends Route
         /** Load WordPress Administration APIs */
         require_once ABSPATH . 'wp-admin/includes/admin.php';
 
-        send_nosniff_header();
-        nocache_headers();
-
         /** This action is documented in wp-admin/admin.php */
         do_action( 'admin_init' );
     }
 
     protected static function bind_wp_rest_request( string $method, array $url_params = [] ) {
 
-        $wp_rest_request = new WP_REST_Request( $method, $_REQUEST['action'] );
+        $wp_rest_request = new WP_REST_Request( $method, '/' );
         $wp_rest_server  = new \WP_REST_Server;
 
         $wp_rest_request->set_url_params( $url_params );
