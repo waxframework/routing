@@ -65,7 +65,7 @@ Here is the structure of the methods that your DI container should have in order
      */
     public function get($name) {}
 	```
-3. `callback` method
+3. `call` method
 	```php
 	 /**
      * Call the given function using the given parameters.
