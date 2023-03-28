@@ -4,7 +4,7 @@
 <a href="https://packagist.org/packages/waxframework/routing"><img src="https://img.shields.io/packagist/l/waxframework/routing" alt="License"></a>
 </p>
 
-# About WaxFrameWork Routing
+# About WaxFramework Routing
 
 WaxFramework Routing is a powerful routing system for WordPress plugins that is similar to the popular PHP framework Laravel. This package makes use of the WordPress REST route system and includes its own custom route system, known as the `Ajax Route`.
 
@@ -12,12 +12,12 @@ One of the key features of WaxFramework Routing is its support for middleware. M
 
 By using WaxFramework Routing in your WordPress plugin, you can easily create custom routes and middleware to handle a wide variety of requests, including AJAX requests, with ease. This makes it an excellent tool for developing modern and dynamic WordPress plugins that require advanced routing capabilities and additional security measures.
 
-- [About WaxFrameWork Routing](#about-waxframework-routing)
+- [About WaxFramework Routing](#about-waxframework-routing)
 	- [Requirement](#requirement)
 		- [Methods structure](#methods-structure)
 	- [Installation](#installation)
 	- [Configuration](#configuration)
-	- [Register Routes In Routes File](#register-routes-in-routes-file)
+	- [Register Routes In Route File](#register-routes-in-route-file)
 		- [Rest Route](#rest-route)
 			- [Write your first route](#write-your-first-route)
 			- [With Controller](#with-controller)
@@ -157,9 +157,9 @@ composer require waxframework/routing
 		$route_service_provider->boot();
 	});
 	```
-That's it! Your plugin is now configured with WaxFrameWork Routing system, and you can start creating your own routes and handling requests with ease.
+That's it! Your plugin is now configured with WaxFramework Routing system, and you can start creating your own routes and handling requests with ease.
 
-## Register Routes In Routes File
+## Register Routes In Route File
 
 ### Rest Route 
 `routes/rest/api.php`
@@ -171,10 +171,11 @@ To create your first RESTful route in WordPress, you can use the `Route` and `Re
 
 use WaxFramework\Routing\Route;
 use WaxFramework\Routing\Response;
+use WP_REST_Request;
 
 defined('ABSPATH') || exit;
 
-Route::get('user', function() {
+Route::get('user', function(WP_REST_Request $wp_rest_request) {
 	return Response::send(['ID' => 1, 'name' => 'john']);
 });
 ```
@@ -252,8 +253,11 @@ Registering an AJAX route is similar to registering a REST route. Instead of usi
 Here is an example of registering an AJAX route to get a user's data:
 ```php
 use WaxFramework\Routing\Ajax;
+use WP_REST_Request;
 
-Ajax::get('user', [UserController::class, 'index']);
+Ajax::get('user', function(WP_REST_Request $wp_rest_request) {
+	return Response::send(['ID' => 1, 'name' => 'john']);
+});
 ```
 
 To route to `WordPress admin`, your route must use a middleware with the name `admin`. If you apply this middleware to your Ajax route, WaxFramework will load the WP admin code. Check out the [Middleware Docs](#middleware) to see the middleware use process.
