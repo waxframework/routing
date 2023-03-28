@@ -25,6 +25,7 @@ By using WaxFramework Routing in your WordPress plugin, you can easily create cu
 			- [Route Grouping](#route-grouping)
 			- [Resource Controller](#resource-controller)
 				- [Actions Handled By Resource Controller](#actions-handled-by-resource-controller)
+		- [Ajax Route](#ajax-route)
 	- [Middleware](#middleware)
 	- [License](#license)
 
@@ -47,7 +48,7 @@ Here is the structure of the methods that your DI container should have in order
      * @param string $name Entry name
      * @param mixed $value Value, define objects
      */
-    public function set( string $name, $value ) {}
+    public function set(string $name, $value) {}
 	```
 2. `get` method
 
@@ -61,7 +62,7 @@ Here is the structure of the methods that your DI container should have in order
      *
      * @return mixed|T
      */
-    public function get( $name ) {}
+    public function get($name) {}
 	```
 3. `callback` method
 	```php
@@ -74,7 +75,7 @@ Here is the structure of the methods that your DI container should have in order
 	 * 
      * @return mixed Result of the function.
      */
-    public function call( $callable ) {}
+    public function call($callable) {}
 	```
 ## Installation
 
@@ -138,9 +139,7 @@ composer require waxframework/routing
                     'namespace' => 'myplugin',
                     'versions'  => []
                 ],
-                'middleware' => [
-                    'admin' => \MyPlugin\Middleware\EnsureIsUserAdmin::class
-                ],
+                'middleware' => [],
                 'routes-dir' => ABSPATH . 'wp-content/plugins/my-plugin/routes'
             ];
 
@@ -206,16 +205,16 @@ Route::get('users/{id?}', [UserController::class, 'index']);
 You can group related routes together using the `group()` method. This allows you to apply middleware or other attributes to multiple routes at once. You can create `nested groups` as well, as shown below:
 
 ```php
-Route::group( 'admin', function() {
+Route::group('admin', function() {
 
-    Route::get( '/',  [UserController::class, 'index'] );
+    Route::get('/',  [UserController::class, 'index']);
 
-    Route::group( 'user', function() {
-        Route::get( '/', [UserController::class, 'index'] );
-        Route::post( '/', [UserController::class, 'store'] );
-        Route::get( '/{id}', [UserController::class, 'show'] );
-        Route::patch( '/{id}', [UserController::class, 'update'] );
-        Route::delete( '/{id}', [UserController::class, 'delete'] );
+    Route::group('user', function() {
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('/{id}', [UserController::class, 'show']);
+        Route::patch('/{id}', [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'delete']);
     } );
 } );
 ```
@@ -224,7 +223,7 @@ Route::group( 'admin', function() {
 Resource routing is a powerful feature that allows you to quickly assign CRUD `(create, read, update, delete)` routes to a controller with a single line of code. To create resource routes, you can use the `resource()` method. Here is an example:
 
 ```php
-Route::resource( 'user', UserController::class );
+Route::resource('user', UserController::class);
 ```
 
 Resource routing automatically generates the typical CRUD routes for your controller, as shown in the table below:
@@ -240,6 +239,21 @@ Resource routing automatically generates the typical CRUD routes for your contro
 | DELETE | /users/{user} | delete |
 
 With resource routing, you don't have to define each route separately. Instead, you can handle all of the CRUD operations in a single controller class, making it easier to organize your code and keep your routes consistent.
+
+### Ajax Route
+
+`routes/ajax/api.php`
+
+Registering an AJAX route is similar to registering a REST route. Instead of using the `Route` class, you need to use the `Ajax` class.
+
+Here is an example of registering an AJAX route to get a user's data:
+```php
+use WaxFramework\Routing\Ajax;
+
+Ajax::get('user', [UserController::class, 'index']);
+```
+
+To route to `WordPress admin`, your route must use a middleware with the name `admin`. If you apply this middleware to your Ajax route, WaxFramework will load the WP admin code. Check out the [Middleware Docs](#middleware) to see the middleware use process.
 
 ## Middleware
 
@@ -270,8 +284,22 @@ class EnsureIsUserAdmin implements Middleware
 }
 ```
 
-Once you have created the middleware, you need to register it in the RouteServiceProvider [Configuration](#configuration).
+Once you have created the middleware, you need to register it in the RouteServiceProvider [Configuration](#configuration). You can do this by adding the middleware class to the `middleware` array in the `$properties` array of the RouteServiceProvider class.
 
+```php
+parent::$properties = [
+	...
+	'middleware' => [
+		'admin' => \MyPlugin\App\Http\Middleware\EnsureIsUserAdmin::class
+	]
+];
+```
+
+To use the middleware in a route, you can add the middleware name as the last argument of the route definition, as shown below:
+
+```php
+Route::get('/admin',  [AdminController::class, 'index'], ['admin']);
+```
 
 ## License
 
