@@ -25,6 +25,8 @@ By using WaxFramework Routing in your WordPress plugin, you can easily create cu
 			- [Route Grouping](#route-grouping)
 			- [Resource Controller](#resource-controller)
 				- [Actions Handled By Resource Controller](#actions-handled-by-resource-controller)
+	- [Middleware](#middleware)
+	- [License](#license)
 
 
 ## Requirement
@@ -238,3 +240,39 @@ Resource routing automatically generates the typical CRUD routes for your contro
 | DELETE | /users/{user} | delete |
 
 With resource routing, you don't have to define each route separately. Instead, you can handle all of the CRUD operations in a single controller class, making it easier to organize your code and keep your routes consistent.
+
+## Middleware
+
+To create a middleware, you need to implement the `Middleware` interface. The `handle` method of the middleware must return a boolean value. If the handle method returns `false`, the request will be stopped immediately.
+
+Here is an example of creating a middleware class named `EnsureIsUserAdmin`:
+
+```php
+<?php
+
+namespace MyPlugin\App\Http\Middleware;
+
+use WaxFramework\Routing\Contracts\Middleware;
+use WP_REST_Request;
+
+class EnsureIsUserAdmin implements Middleware
+{
+    /**
+    * Handle an incoming request.
+    *
+    * @param  WP_REST_Request  $wp_rest_request
+    * @return bool
+    */
+    public function handle( WP_REST_Request $wp_rest_request ): bool
+    {
+        return current_user_can( 'manage_options' );
+    }
+}
+```
+
+Once you have created the middleware, you need to register it in the RouteServiceProvider [Configuration](#configuration).
+
+
+## License
+
+WaxFramework Routing is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
