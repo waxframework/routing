@@ -26,6 +26,7 @@ By using WaxFramework Routing in your WordPress plugin, you can easily create cu
 			- [Resource Controller](#resource-controller)
 				- [Actions Handled By Resource Controller](#actions-handled-by-resource-controller)
 		- [Ajax Route](#ajax-route)
+		- [Get Api Endpoint](#get-api-endpoint)
 	- [Middleware](#middleware)
 	- [License](#license)
 
@@ -91,14 +92,14 @@ composer require waxframework/routing
 
 4. Folder structure example:
 	```
-	routes:
-	    ajax:
-	        api.php
+    routes:
+        rest:
+            api.php
             v1.php
             v2.php
-	    rest:
-	       api.php
-		   v1.php
+        ajax:
+           api.php
+           v1.php
 	```
 5. In your `RouteServiceProvider` class, set the necessary properties for your route system. This includes setting the `rest and ajax namespaces`, the versions of your routes, any middleware you want to use, and the directory where your route files are located. Here's an example:
 	```php
@@ -244,6 +245,8 @@ With resource routing, you don't have to define each route separately. Instead, 
 
 `routes/ajax/api.php`
 
+Sometimes third-party plugins don't load when using the WordPress rest route. To fix this issue we are creating our own route system (Ajax Route).
+
 Registering an AJAX route is similar to registering a REST route. Instead of using the `Route` class, you need to use the `Ajax` class.
 
 Here is an example of registering an AJAX route to get a user's data:
@@ -254,6 +257,27 @@ Ajax::get('user', [UserController::class, 'index']);
 ```
 
 To route to `WordPress admin`, your route must use a middleware with the name `admin`. If you apply this middleware to your Ajax route, WaxFramework will load the WP admin code. Check out the [Middleware Docs](#middleware) to see the middleware use process.
+
+### Get Api Endpoint
+
+The `get_rest_url()` function can be used to get the REST API endpoint for the current site. To use this function, you need to provide the current site ID and the `namespace` for your plugin.
+
+```php
+$site_id   = get_current_blog_id();
+$namespace = 'myplugin';
+
+$rest_route_path = get_rest_url($site_id, $namespace);
+
+$user_rest_route = $rest_route_path . '/user';
+```
+
+Similarly, you can use the `get_site_url()` function to get the URL of the current site, and then append your namespace to it to create the AJAX API endpoint URL.
+
+```php
+$ajax_route_path = get_site_url($site_id) . '/' . $namespace;
+
+$user_ajax_route = $ajax_route_path . '/user';
+```
 
 ## Middleware
 
