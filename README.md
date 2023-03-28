@@ -108,11 +108,10 @@ composer require waxframework/routing
 
     namespace MyPlugin\Providers;
 
-    use WaxFramework\Contracts\Provider;
     use MyPlugin\Container;
     use WaxFramework\Routing\Providers\RouteServiceProvider as WaxRouteServiceProvider;
 
-    class RouteServiceProvider extends WaxRouteServiceProvider implements Provider {
+    class RouteServiceProvider extends WaxRouteServiceProvider {
 
         public function boot() {
 
