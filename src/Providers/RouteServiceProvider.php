@@ -23,20 +23,23 @@ abstract class RouteServiceProvider
 
     public function action_ajax_api_init() {
         global $wp_query;
-        
-        if ( isset( $wp_query->query['pagename'] ) && 0 === strpos( $wp_query->query['pagename'], static::$properties['ajax']['namespace'] ) ) {
-            static::init_routes( 'ajax' );
-            if ( ! Ajax::$route_found ) {
-                Response::set_headers( [], 404 );
-                echo wp_json_encode(
-                    [
-                        'code'    => 'ajax_no_route', 
-                        'message' => 'No route was found matching the URL and request method.'
-                    ] 
-                );
-            }
-            exit;
+
+        if ( ! isset( $wp_query->query['pagename'] ) || 1 !==  preg_match( "@^" . static::$properties['ajax']['namespace'] . "/(.*)/?@i", $wp_query->query['pagename'] ) ) {
+            return;
         }
+
+        static::init_routes( 'ajax' );
+
+        if ( ! Ajax::$route_found ) {
+            Response::set_headers( [], 404 );
+            echo wp_json_encode(
+                [
+                    'code'    => 'ajax_no_route', 
+                    'message' => 'No route was found matching the URL and request method.'
+                ] 
+            );
+        }
+        exit;
     }
 
     /**

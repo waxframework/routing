@@ -14,15 +14,16 @@ class Middleware {
 
     public static function is_user_allowed( array $middleware ) {
         $container = RouteServiceProvider::$container;
+
         foreach ( $middleware as $middleware_name ) {
-            if ( array_key_exists( $middleware_name, static::$middleware ) ) {
-                $current_middleware = static::$middleware[$middleware_name];
-                $middleware_object  = $container->get( $current_middleware );
+            if ( ! array_key_exists( $middleware_name, static::$middleware ) ) {
+                return false;
+            }
+
+            $current_middleware = static::$middleware[$middleware_name];
+            $middleware_object  = $container->get( $current_middleware );
         
-                if ( ! $middleware_object instanceof MiddlewareContract || ! $container->call( [$middleware_object, 'handle'] ) ) {
-                    return false;
-                }
-            } else {
+            if ( ! $middleware_object instanceof MiddlewareContract || ! $container->call( [$middleware_object, 'handle'] ) ) {
                 return false;
             }
         }
