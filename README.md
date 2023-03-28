@@ -23,8 +23,8 @@ By using WaxFramework Routing in your WordPress plugin, you can easily create cu
 			- [With Controller](#with-controller)
 			- [Dynamic Routing](#dynamic-routing)
 			- [Route Grouping](#route-grouping)
-		- [Resource Controller](#resource-controller)
-			- [Actions Handled By Resource Controller](#actions-handled-by-resource-controller)
+			- [Resource Controller](#resource-controller)
+				- [Actions Handled By Resource Controller](#actions-handled-by-resource-controller)
 
 
 ## Requirement
@@ -218,7 +218,7 @@ Route::group( 'admin', function() {
 } );
 ```
 
-### Resource Controller
+#### Resource Controller
 Resource routing is a powerful feature that allows you to quickly assign CRUD `(create, read, update, delete)` routes to a controller with a single line of code. To create resource routes, you can use the `resource()` method. Here is an example:
 
 ```php
@@ -227,7 +227,7 @@ Route::resource( 'user', UserController::class );
 
 Resource routing automatically generates the typical CRUD routes for your controller, as shown in the table below:
 
-#### Actions Handled By Resource Controller
+##### Actions Handled By Resource Controller
 
 | Verb   | URI           | Action |
 |--------|---------------|--------|
