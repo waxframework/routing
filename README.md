@@ -12,6 +12,16 @@ One of the key features of WaxFramework Routing is its support for middleware. M
 
 By using WaxFramework Routing in your WordPress plugin, you can easily create custom routes and middleware to handle a wide variety of requests, including AJAX requests, with ease. This makes it an excellent tool for developing modern and dynamic WordPress plugins that require advanced routing capabilities and additional security measures.
 
+- [About WaxFrameWork Routing](#about-waxframework-routing)
+	- [Requirement](#requirement)
+		- [Methods structure](#methods-structure)
+	- [Installation](#installation)
+	- [Configuration](#configuration)
+	- [Register Routes In Routes File](#register-routes-in-routes-file)
+		- [Rest Route](#rest-route)
+		- [Ajax Route](#ajax-route)
+
+
 ## Requirement
 
 WaxFramework routing requires a dependency injection (DI) container. We do not use any hard-coded library, so you can choose to use any DI library you prefer. However, it is important to follow our DI structure, which includes having the `set`, `get`, and `call` methods in your DI container.
@@ -76,8 +86,8 @@ composer require waxframework/routing
 	routes:
 	    ajax:
 	        api.php
-		    v1.php
-		    v2.php
+            v1.php
+            v2.php
 	    rest:
 	       api.php
 		   v1.php
@@ -141,3 +151,37 @@ composer require waxframework/routing
 	});
 	```
 That's it! Your plugin is now configured with WaxFrameWork Routing system, and you can start creating your own routes and handling requests with ease.
+
+## Register Routes In Routes File
+
+### Rest Route 
+`routes/rest/api.php`
+
+```php
+<?php
+
+use WaxFramework\Routing\Route;
+use WaxFramework\Routing\Response;
+
+defined('ABSPATH') || exit;
+
+Route::get('user', function() {
+	return Response::send(['ID' => 1, 'name' => 'john']);
+});
+```
+
+### Ajax Route 
+`routes/ajax/api.php`
+
+```php
+<?php
+
+use WaxFramework\Routing\Ajax;
+use WaxFramework\Routing\Response;
+
+defined('ABSPATH') || exit;
+
+Ajax::get('user', function() {
+	return Response::send(['ID' => 1, 'name' => 'john']);
+});
+```
