@@ -19,7 +19,12 @@ By using WaxFramework Routing in your WordPress plugin, you can easily create cu
 	- [Configuration](#configuration)
 	- [Register Routes In Routes File](#register-routes-in-routes-file)
 		- [Rest Route](#rest-route)
-		- [Ajax Route](#ajax-route)
+			- [Write your first route](#write-your-first-route)
+			- [With Controller](#with-controller)
+			- [Dynamic Routing](#dynamic-routing)
+			- [Route Grouping](#route-grouping)
+		- [Resource Controller](#resource-controller)
+			- [Actions Handled By Resource Controller](#actions-handled-by-resource-controller)
 
 
 ## Requirement
@@ -157,6 +162,8 @@ That's it! Your plugin is now configured with WaxFrameWork Routing system, and y
 ### Rest Route 
 `routes/rest/api.php`
 
+#### Write your first route
+To create your first RESTful route in WordPress, you can use the `Route` and `Response` classes from the `WaxFramework\Routing` namespace, as shown below:
 ```php
 <?php
 
@@ -170,18 +177,64 @@ Route::get('user', function() {
 });
 ```
 
-### Ajax Route 
-`routes/ajax/api.php`
+In this example, we're using the `get()` method of the Route class to define a `GET request` to the /user endpoint. The closure passed as the second argument returns a response using the `Response::send()` method, which takes an array of data to be returned in `JSON format`.
+#### With Controller
+If you prefer to use a controller for your route logic, you can specify the controller and method as an array, as shown below:
 
 ```php
-<?php
-
-use WaxFramework\Routing\Ajax;
-use WaxFramework\Routing\Response;
-
-defined('ABSPATH') || exit;
-
-Ajax::get('user', function() {
-	return Response::send(['ID' => 1, 'name' => 'john']);
-});
+Route::get('user', [UserController::class, 'index']);
 ```
+Here, we're using the `get()` method of the Route class to define a `GET request` to the /user endpoint. We're specifying the controller class and method as an array, where `UserController::class` refers to the class name and `index` is the method name.
+
+#### Dynamic Routing
+You can use dynamic routing to handle requests to endpoints with dynamic parameters. To define a route with a required parameter, use curly braces around the parameter name, as shown below:
+
+```php
+// Required id
+Route::get('users/{id}', [UserController::class, 'index']);
+```
+
+To define a route with an optional parameter, you can add a question mark after the parameter name, as shown below:
+
+```php
+// Optional id
+Route::get('users/{id?}', [UserController::class, 'index']);
+```
+#### Route Grouping
+You can group related routes together using the `group()` method. This allows you to apply middleware or other attributes to multiple routes at once. You can create `nested groups` as well, as shown below:
+
+```php
+Route::group( 'admin', function() {
+
+    Route::get( '/',  [UserController::class, 'index'] );
+
+    Route::group( 'user', function() {
+        Route::get( '/', [UserController::class, 'index'] );
+        Route::post( '/', [UserController::class, 'store'] );
+        Route::get( '/{id}', [UserController::class, 'show'] );
+        Route::patch( '/{id}', [UserController::class, 'update'] );
+        Route::delete( '/{id}', [UserController::class, 'delete'] );
+    } );
+} );
+```
+
+### Resource Controller
+Resource routing is a powerful feature that allows you to quickly assign CRUD `(create, read, update, delete)` routes to a controller with a single line of code. To create resource routes, you can use the `resource()` method. Here is an example:
+
+```php
+Route::resource( 'user', UserController::class );
+```
+
+Resource routing automatically generates the typical CRUD routes for your controller, as shown in the table below:
+
+#### Actions Handled By Resource Controller
+
+| Verb   | URI           | Action |
+|--------|---------------|--------|
+| GET    | /users        | index  |
+| POST   | /users        | store  |
+| GET    | /users/{user} | show   |
+| PATCH  | /users/{user} | update |
+| DELETE | /users/{user} | delete |
+
+With resource routing, you don't have to define each route separately. Instead, you can handle all of the CRUD operations in a single controller class, making it easier to organize your code and keep your routes consistent.
