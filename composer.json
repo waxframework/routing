@@ -8,6 +8,12 @@
             "WaxFramework\\Routing\\": "src/"
         }
     },
+    "authors": [
+        {
+            "name": "MD AL AMIN",
+            "email": "mdalaminbey@gmail.com"
+        }
+    ],
     "scripts": {
         "format": "vendor/bin/phpcbf --standard=phpcs.xml",
         "phpcs": "vendor/bin/phpcs --standard=phpcs.xml --report-full --report-checkstyle=./phpcs-report.xml"
