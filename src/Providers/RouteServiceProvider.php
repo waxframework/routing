@@ -6,6 +6,7 @@ use WaxFramework\Routing\Response;
 use WaxFramework\Routing\DataBinder;
 use WaxFramework\Routing\Ajax;
 use WaxFramework\Routing\Middleware;
+use Wp;
 
 abstract class RouteServiceProvider
 {
@@ -15,16 +16,16 @@ abstract class RouteServiceProvider
 
     public function boot() {
         add_action( 'rest_api_init', [$this, 'action_rest_api_init'] );
-        /**
-         * Hook fire priority https://codex.wordpress.org/Plugin_API/Action_Reference
-         */
-        add_action( 'template_redirect', [$this, 'action_ajax_api_init'], 1 );
+        add_action( 'parse_request', [$this, 'action_ajax_api_init'], 1 );
     }
 
-    public function action_ajax_api_init() {
-        global $wp_query;
-
-        if ( ! isset( $wp_query->query['pagename'] ) || 1 !==  preg_match( "@^" . static::$properties['ajax']['namespace'] . "/(.*)/?@i", $wp_query->query['pagename'] ) ) {
+    /**
+     * Fires once all query variables for the current request have been parsed.
+     *
+     * @param WP $wp Current WordPress environment instance (passed by reference).
+     */
+    public function action_ajax_api_init( WP $wp ) {
+        if ( ! isset( $wp->request ) || 1 !== preg_match( "@^" . static::$properties['ajax']['namespace'] . "/(.*)/?@i", $wp->request ) ) {
             return;
         }
 

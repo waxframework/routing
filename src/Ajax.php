@@ -4,9 +4,10 @@ namespace WaxFramework\Routing;
 
 use WaxFramework\Routing\Providers\RouteServiceProvider;
 use WP_REST_Request;
+use WP_REST_Server;
+use WP;
 
-class Ajax extends Route
-{
+class Ajax extends Route {
     protected static $ajax_routes = [];
 
     public static bool $route_found = false;
@@ -19,10 +20,12 @@ class Ajax extends Route
         $route      = static::get_final_route( $route );
         $middleware = array_merge( static::$group_middleware, $middleware );
        
-        global $wp_query;
+        global $wp;
+        /**
+         * @var WP $wp
+         */
 
-        $path  = '/' . $wp_query->query['pagename'] . '/' . $wp_query->query['page'];
-        $match = preg_match( '@^' . $route . '$@i', rtrim( $path, '/' ) , $matches );
+        $match = preg_match( '@^' . $route . '$@i', rtrim( '/' . $wp->request, '/' ), $matches );
 
         if ( ! $match ) {
             return;
@@ -87,7 +90,7 @@ class Ajax extends Route
     protected static function bind_wp_rest_request( string $method, array $url_params = [] ) {
 
         $wp_rest_request = new WP_REST_Request( $method, '/' );
-        $wp_rest_server  = new \WP_REST_Server;
+        $wp_rest_server  = new WP_REST_Server;
 
         $wp_rest_request->set_url_params( $url_params );
         $wp_rest_request->set_query_params( wp_unslash( $_GET ) );
