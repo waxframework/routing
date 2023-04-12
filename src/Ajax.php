@@ -13,6 +13,7 @@ class Ajax extends Route {
     public static bool $route_found = false;
 
     protected static function register_route( string $method, string $route, $callback, array $middleware = [] ) {
+        //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
         if ( $method !== $_SERVER['REQUEST_METHOD'] ) {
             return;
         }
@@ -93,7 +94,9 @@ class Ajax extends Route {
         $wp_rest_server  = new WP_REST_Server;
 
         $wp_rest_request->set_url_params( $url_params );
+        //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $wp_rest_request->set_query_params( wp_unslash( $_GET ) );
+        //phpcs:ignore WordPress.Security.NonceVerification.Missing
         $wp_rest_request->set_body_params( wp_unslash( $_POST ) );
         $wp_rest_request->set_file_params( $_FILES );
         $wp_rest_request->set_headers( $wp_rest_server->get_headers( wp_unslash( $_SERVER ) ) );
