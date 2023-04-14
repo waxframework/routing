@@ -3,6 +3,7 @@
 namespace WaxFramework\Routing;
 
 use WaxFramework\Routing\Providers\RouteServiceProvider;
+use WP_REST_Request;
 
 class Route
 {
@@ -97,7 +98,7 @@ class Route
         rest_get_server()->register_route(
             $namespace, $full_route, [
                 'methods'             => $method,
-                'callback'            => function( \WP_REST_Request $wp_rest_request ) use( $callback ) {
+                'callback'            => function( WP_REST_Request $wp_rest_request ) use( $callback ) {
                     RouteServiceProvider::$container->set( WP_REST_Request::class, $wp_rest_request );
                     return static::callback( $callback );
                 },
@@ -126,10 +127,10 @@ class Route
 
     protected static function get_final_route( string $route ) {
         if ( ! empty( static::$route_prefix ) ) {
-            $route = trim( static::$route_prefix, '/' ) . '/' . ltrim( $route, '/' );
-        } else {
-            $route = ltrim( $route, '/' );
+            $route = rtrim( static::$route_prefix, '/' ) . '/' . ltrim( $route, '/' );
         }
+
+        $route = ltrim( $route, '/' );
         
         $data_binder = RouteServiceProvider::$container->get( DataBinder::class );
         $namespace   = $data_binder->get_namespace();
