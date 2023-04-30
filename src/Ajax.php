@@ -43,6 +43,7 @@ class Ajax extends Route {
 
         if ( ! $is_allowed ) {
             status_header( 401 );
+            Response::set_headers( [] );
             echo wp_json_encode(
                 [
                     'code'    => 'ajax_forbidden', 
