@@ -3,6 +3,7 @@
 namespace WaxFramework\Routing;
 
 use WaxFramework\Routing\Providers\RouteServiceProvider;
+use WP_HTTP_Response;
 use WP_REST_Request;
 
 class Route
@@ -111,18 +112,27 @@ class Route
 
     public static function callback( $callback ) {
         if ( is_callable( $callback ) ) {
-            return RouteServiceProvider::$container->call( $callback );
-        } elseif ( 2 === count( $callback ) ) {
-            $controller = RouteServiceProvider::$container->get( $callback[0] );
-            return RouteServiceProvider::$container->call( [$controller, $callback[1]] );
+            $response = RouteServiceProvider::$container->call( $callback );
+            static::set_status_code( $response['status_code'] );
+            return $response['data'];
         }
+        static::set_status_code( 404 );
+        return ['code' => 'unknown_callback', 'message' => 'Please use valid callback'];
+    }
 
-        Response::set_headers( [], 404 );
-
-        return [
-            'code'    => 'unknown_callback', 
-            'message' => 'Please use valid callback'
-        ];
+    protected static function set_status_code( int $status_code ) {
+        status_header( $status_code );
+        /**
+         * Filters the REST API response.
+         *
+         * @param WP_HTTP_Response $result  Result to send to the client. Usually a <code>WP_REST_Response</code>.
+         */
+        add_filter(
+            'rest_post_dispatch', function( WP_HTTP_Response $result ) use( $status_code ) {
+                $result->set_status( $status_code );
+                return $result;
+            }
+        );
     }
 
     protected static function get_final_route( string $route ) {

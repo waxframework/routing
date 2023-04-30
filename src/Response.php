@@ -5,17 +5,13 @@ namespace WaxFramework\Routing;
 class Response
 {
     public static function send( array $data, int $status_code = 200, array $headers = [] ) {
-        static::set_headers( $headers, $status_code );
-        return $data;
+        static::set_headers( $headers );
+        return compact( 'data', 'status_code' );
     }
 
-    public static function set_headers( array $headers, int $status_code = null, bool $default = true ) {
+    public static function set_headers( array $headers, bool $default = true ) {
         if ( headers_sent() ) {
             return;
-        }
-
-        if ( $status_code ) {
-            status_header( $status_code );
         }
 
         if ( $default ) {

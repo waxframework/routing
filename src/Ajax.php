@@ -42,7 +42,7 @@ class Ajax extends Route {
         $is_allowed = Middleware::is_user_allowed( $middleware );
 
         if ( ! $is_allowed ) {
-            Response::set_headers( [], 401 );
+            status_header( 401 );
             echo wp_json_encode(
                 [
                     'code'    => 'ajax_forbidden', 

@@ -32,7 +32,7 @@ abstract class RouteServiceProvider
         static::init_routes( 'ajax' );
 
         if ( ! Ajax::$route_found ) {
-            Response::set_headers( [], 404 );
+            status_header( 404 );
             echo wp_json_encode(
                 [
                     'code'    => 'ajax_no_route', 
