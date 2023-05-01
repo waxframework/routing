@@ -98,14 +98,16 @@ class Route
 
         rest_get_server()->register_route(
             $namespace, $full_route, [
-                'methods'             => $method,
-                'callback'            => function( WP_REST_Request $wp_rest_request ) use( $callback ) {
-                    RouteServiceProvider::$container->set( WP_REST_Request::class, $wp_rest_request );
-                    return static::callback( $callback );
-                },
-                'permission_callback' => function() use( $middleware ) {
-                    return Middleware::is_user_allowed( $middleware );
-                }
+                [
+                    'methods'             => $method,
+                    'callback'            => function( WP_REST_Request $wp_rest_request ) use( $callback ) {
+                        RouteServiceProvider::$container->set( WP_REST_Request::class, $wp_rest_request );
+                        return static::callback( $callback );
+                    },
+                    'permission_callback' => function() use( $middleware ) {
+                        return Middleware::is_user_allowed( $middleware );
+                    }
+                ]
             ] 
         );
     }
