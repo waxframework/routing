@@ -115,6 +115,9 @@ class Route
     protected static function callback( $callback ) {
         if ( is_callable( $callback ) ) {
             $response = RouteServiceProvider::$container->call( $callback );
+            if ( ! is_array( $response ) ) {
+                exit;
+            }
             static::set_status_code( $response['status_code'] );
             return $response['data'];
         }
