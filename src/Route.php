@@ -142,13 +142,12 @@ class Route
             $route = rtrim( static::$route_prefix, '/' ) . '/' . ltrim( $route, '/' );
         }
 
-        $route = ltrim( $route, '/' );
-        
+        $route = trim( $route, '/' );
+        $route = static::format_route_regex( $route );
+
         $data_binder = RouteServiceProvider::$container->get( DataBinder::class );
         $namespace   = $data_binder->get_namespace();
         $version     = $data_binder->get_version();
-
-        $route = static::format_route_regex( $route );
 
         if ( ! empty( $version ) ) {
             return "/{$namespace}/{$version}/{$route}";
