@@ -112,7 +112,7 @@ class Route
         );
     }
 
-    public static function callback( $callback ) {
+    protected static function callback( $callback ) {
         if ( is_callable( $callback ) ) {
             $response = RouteServiceProvider::$container->call( $callback );
             static::set_status_code( $response['status_code'] );
