@@ -113,16 +113,12 @@ class Route
     }
 
     protected static function callback( $callback ) {
-        if ( is_callable( $callback ) ) {
-            $response = RouteServiceProvider::$container->call( $callback );
-            if ( ! is_array( $response ) ) {
-                exit;
-            }
-            static::set_status_code( $response['status_code'] );
-            return $response['data'];
+        $response = RouteServiceProvider::$container->call( $callback );
+        if ( ! is_array( $response ) ) {
+            exit;
         }
-        static::set_status_code( 404 );
-        return ['code' => 'unknown_callback', 'message' => 'Please use valid callback'];
+        static::set_status_code( $response['status_code'] );
+        return $response['data'];
     }
 
     protected static function set_status_code( int $status_code ) {
