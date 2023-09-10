@@ -3,6 +3,7 @@
 namespace WaxFramework\Routing;
 
 use WaxFramework\Routing\Providers\RouteServiceProvider;
+use WP_Error;
 use WP_HTTP_Response;
 use WP_REST_Request;
 
@@ -105,7 +106,11 @@ class Route
                         return static::callback( $callback );
                     },
                     'permission_callback' => function() use( $middleware ) {
-                        return Middleware::is_user_allowed( $middleware );
+                        $permission = Middleware::is_user_allowed( $middleware );
+                        if ( $permission instanceof WP_Error ) {
+                            static::set_status_code( $permission->get_error_code() );
+                        }
+                        return $permission;
                     }
                 ]
             ] 

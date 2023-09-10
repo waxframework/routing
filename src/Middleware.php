@@ -4,6 +4,7 @@ namespace WaxFramework\Routing;
 
 use WaxFramework\Routing\Providers\RouteServiceProvider;
 use WaxFramework\Routing\Contracts\Middleware as MiddlewareContract;
+use WP_Error;
 
 class Middleware {
     protected static array $middleware = [];
@@ -12,6 +13,10 @@ class Middleware {
         static::$middleware = $middleware;
     }
 
+    /**
+     * @param array $middleware
+     * @return boolean|WP_Error
+     */
     public static function is_user_allowed( array $middleware ) {
         $container = RouteServiceProvider::$container;
 
@@ -23,9 +28,17 @@ class Middleware {
             $current_middleware = static::$middleware[$middleware_name];
             $middleware_object  = $container->get( $current_middleware );
         
-            if ( ! $middleware_object instanceof MiddlewareContract || ! $container->call( [$middleware_object, 'handle'] ) ) {
+            if ( ! $middleware_object instanceof MiddlewareContract ) {
                 return false;
             }
+
+            $permission = $container->call( [$middleware_object, 'handle'] );
+
+            if ( $permission instanceof WP_Error || is_bool( $permission ) ) {
+                return $permission;
+            }
+
+            return false;
         }
         
         return true;
