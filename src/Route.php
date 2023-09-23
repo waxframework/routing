@@ -119,11 +119,22 @@ class Route
 
     protected static function callback( $callback ) {
         $response = RouteServiceProvider::$container->call( $callback );
+
         if ( ! is_array( $response ) ) {
             exit;
         }
-        static::set_status_code( $response['status_code'] );
-        return $response['data'];
+
+        $status_code = intval( $response['status_code'] );
+        static::set_status_code( $status_code );
+
+        $response = $response['data'];
+
+        if ( $status_code > 399 && 600 > $status_code ) {
+            $response['data']['status'] = $status_code;
+            return $response;
+        }
+
+        return $response;
     }
 
     protected static function set_status_code( int $status_code ) {
