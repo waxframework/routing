@@ -34,7 +34,7 @@ class Middleware {
 
             $permission = $container->call( [$middleware_object, 'handle'] );
 
-            if ( $permission instanceof WP_Error || ! $permission ) ) {
+            if ( $permission instanceof WP_Error || ! $permission ) {
                 return $permission;
             }
         }
